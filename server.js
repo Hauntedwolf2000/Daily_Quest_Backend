@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "../Frontend/public")));
 
 // POST endpoint to save questions as JSON
-app.post("/save-questions", (req, res) => {
+app.post("/api/save-questions", (req, res) => {
   const questions = req.body;
 
   // Ensure target directory exists
@@ -42,7 +42,7 @@ const storage = multer.memoryStorage(); // Store uploaded file in memory
 const upload = multer({ storage: storage });
 
 // POST endpoint to upload and extract zip file
-app.post("/upload-zip", upload.single("zipFile"), async (req, res) => {
+app.post("/api/upload-zip", upload.single("zipFile"), async (req, res) => {
   if (!req.file) {
     return res.status(400).send("No zip file uploaded.");
   }
@@ -103,7 +103,7 @@ app.post("/upload-zip", upload.single("zipFile"), async (req, res) => {
 });
 
 // 🔥 DELETE all resources API
-app.delete("/delete-all", (req, res) => {
+app.delete("/api/delete-all", (req, res) => {
   try {
     const resourcesPath = path.join(__dirname, "../Frontend/public/Resources");
 
