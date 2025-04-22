@@ -102,6 +102,37 @@ app.post("/upload-zip", upload.single("zipFile"), async (req, res) => {
   }
 });
 
+// 🔥 DELETE all resources API
+app.delete("/delete-all", (req, res) => {
+  try {
+    const resourcesPath = path.join(__dirname, "../Frontend/public/Resources");
+
+    const questionsFile = path.join(resourcesPath, "questions.json");
+    const imgFolder = path.join(resourcesPath, "img");
+    const videoFolder = path.join(resourcesPath, "video");
+
+    // Delete questions.json if exists
+    if (fs.existsSync(questionsFile)) {
+      fs.unlinkSync(questionsFile);
+    }
+
+    // Delete img folder
+    if (fs.existsSync(imgFolder)) {
+      fs.rmSync(imgFolder, { recursive: true, force: true });
+    }
+
+    // Delete video folder
+    if (fs.existsSync(videoFolder)) {
+      fs.rmSync(videoFolder, { recursive: true, force: true });
+    }
+
+    res.status(200).json({ message: "All resources deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting resources:", error);
+    res.status(500).json({ error: "Failed to delete resources." });
+  }
+});
+
 
 // Start server
 app.listen(port, () => {
