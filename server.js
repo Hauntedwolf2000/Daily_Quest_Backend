@@ -20,14 +20,20 @@ app.use(express.static(path.join(__dirname, "../Frontend/public")));
 app.post("/api/save-questions", (req, res) => {
   const questions = req.body;
 
-  // Ensure target directory exists
-  const dirPath = path.join(__dirname, "../Frontend/public/Resources");
+ // 1. Different path for local vs vercel
+ let dirPath;
+ if (process.env.VERCEL) {
+   dirPath = "/tmp/Resources"; // on Vercel, only /tmp is writable
+ } else {
+   dirPath = path.join(__dirname, "../Frontend/public/Resources");
+ }
 
-  if (process.env.VERCEL) {
-    dirPath = "/tmp/Resources";
-  }
+ // 2. Create directory if it doesn't exist
+ if (!fs.existsSync(dirPath)) {
+   fs.mkdirSync(dirPath, { recursive: true });
+ }
 
-  
+
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
