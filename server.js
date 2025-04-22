@@ -17,23 +17,11 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "../Frontend/public")));
 
 // POST endpoint to save questions as JSON
-app.post("/api/save-questions", (req, res) => {
+app.post("/save-questions", (req, res) => {
   const questions = req.body;
 
- // 1. Different path for local vs vercel
- let dirPath;
- if (process.env.VERCEL) {
-   dirPath = "/tmp/Resources"; // on Vercel, only /tmp is writable
- } else {
-   dirPath = path.join(__dirname, "../Frontend/public/Resources");
- }
-
- // 2. Create directory if it doesn't exist
- if (!fs.existsSync(dirPath)) {
-   fs.mkdirSync(dirPath, { recursive: true });
- }
-
-
+  // Ensure target directory exists
+  const dirPath = path.join(__dirname, "../Frontend/public/Resources");
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
@@ -54,7 +42,7 @@ const storage = multer.memoryStorage(); // Store uploaded file in memory
 const upload = multer({ storage: storage });
 
 // POST endpoint to upload and extract zip file
-app.post("/api/upload-zip", upload.single("zipFile"), async (req, res) => {
+app.post("/upload-zip", upload.single("zipFile"), async (req, res) => {
   if (!req.file) {
     return res.status(400).send("No zip file uploaded.");
   }
@@ -114,8 +102,8 @@ app.post("/api/upload-zip", upload.single("zipFile"), async (req, res) => {
   }
 });
 
-// 🔥 DELETE all resources API
-app.delete("/api/delete-all", (req, res) => {
+// DELETE all resources API
+app.delete("/api/delete-all", (req, res) => { 
   try {
     const resourcesPath = path.join(__dirname, "../Frontend/public/Resources");
 
@@ -123,17 +111,14 @@ app.delete("/api/delete-all", (req, res) => {
     const imgFolder = path.join(resourcesPath, "img");
     const videoFolder = path.join(resourcesPath, "video");
 
-    // Delete questions.json if exists
     if (fs.existsSync(questionsFile)) {
       fs.unlinkSync(questionsFile);
     }
 
-    // Delete img folder
     if (fs.existsSync(imgFolder)) {
       fs.rmSync(imgFolder, { recursive: true, force: true });
     }
 
-    // Delete video folder
     if (fs.existsSync(videoFolder)) {
       fs.rmSync(videoFolder, { recursive: true, force: true });
     }
@@ -145,5 +130,7 @@ app.delete("/api/delete-all", (req, res) => {
   }
 });
 
-
-module.exports = app;
+// Start server
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
