@@ -22,6 +22,12 @@ app.post("/api/save-questions", (req, res) => {
 
   // Ensure target directory exists
   const dirPath = path.join(__dirname, "../Frontend/public/Resources");
+
+  if (process.env.VERCEL) {
+    dirPath = "/tmp/Resources";
+  }
+
+  
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
